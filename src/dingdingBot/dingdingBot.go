@@ -45,6 +45,8 @@ func getSign(secret string) (sign string, timeStamp string) {
 
 func InitBot(url string, secret string) *DingTalkBot {
 	//初始化 client
+	// ：param url 钉钉机器人调用链接
+	// ：param secret 签名，如果不使用加签验证可穿空值
 	if len(secret) != 0 {
 		sign, timeStamp := getSign(secret)
 		url = fmt.Sprintf("%s&timestamp=%s&sign=%s", url, timeStamp, sign)
@@ -53,7 +55,13 @@ func InitBot(url string, secret string) *DingTalkBot {
 	bot.SetBaseURL(url)
 	return &DingTalkBot{bot}
 }
-func (bot *DingTalkBot) SendTextMessage(msg string, IsAtAll bool, atmobiles []string, at_dingtalk_ids []string) (resp interface{}, err error) {
+func (bot *DingTalkBot) SendTextMessage(msg string, IsAtAll bool, at_dingtalk_ids []string, atmobiles []string) (resp interface{}, err error) {
+	//  text类型
+	// :param msg: 消息内容
+	// :param IsAtAll: @所有人时：true，否则为false（可选）
+	// :param atmobiles: 被@人的手机号（注意：可以在msg内容里自定义@手机号的位置，也支持同时@多个手机号，可选）
+	// :param at_dingtalk_ids: 被@人的dingtalkId（可选）
+	// :return: 返回消息发送结果
 	text_info := new(textMessage)
 	text_info.Text.Content = msg
 	text_info.At.IsAtAll = IsAtAll
