@@ -31,7 +31,7 @@ type textMessage struct {
 }
 
 type DingTalkBot struct {
-	Client *http.Client
+	client *http.Client
 	url    string
 }
 
@@ -74,7 +74,7 @@ func (bot *DingTalkBot) SendTextMessage(msg string, IsAtAll bool, at_dingtalk_id
 	text, err := json.Marshal(text_info)
 	req, _ := http.NewRequest("POST", bot.url, strings.NewReader(string(text)))
 	req.Header.Set("Content-Type", "application/json;charset=utf-8")
-	re, err := bot.Client.Do(req)
+	re, err := bot.client.Do(req)
 	if err != nil {
 		fmt.Println(err.Error())
 		return nil, err
