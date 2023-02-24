@@ -1,6 +1,8 @@
 package main
 
-import "dingdingBot/src/dingdingBot"
+import (
+	"github.com/ATao13/dingdingBot/src/dingdingBot"
+)
 
 func main() {
 

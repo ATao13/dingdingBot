@@ -1,14 +1,18 @@
+package dingdingBot
+
 //钉钉Webhook机器人使用，支持 text，link、actionCard、markdown 格式消息发送
 // 兼容sercet模式
-package dingdingBot
 
 import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
-	"github.com/imroc/req/v3"
+	"io/ioutil"
+	"net/http"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -26,11 +30,9 @@ type textMessage struct {
 	Msgtype string `json:"msgtype"`
 }
 
-//msgtypetype DingTalkClient interface {
-//	SendMessage(...interface{}) (resp interface{}, err error)
-//}
 type DingTalkBot struct {
-	*req.Client
+	Client *http.Client
+	url    string
 }
 
 func getSign(secret string) (sign string, timeStamp string) {
@@ -51,9 +53,10 @@ func InitBot(url string, secret string) *DingTalkBot {
 		sign, timeStamp := getSign(secret)
 		url = fmt.Sprintf("%s&timestamp=%s&sign=%s", url, timeStamp, sign)
 	}
-	bot := req.C()
-	bot.SetBaseURL(url)
-	return &DingTalkBot{bot}
+	return &DingTalkBot{
+		&http.Client{},
+		url,
+	}
 }
 func (bot *DingTalkBot) SendTextMessage(msg string, IsAtAll bool, at_dingtalk_ids []string, atmobiles []string) (resp interface{}, err error) {
 	//  text类型
@@ -68,12 +71,16 @@ func (bot *DingTalkBot) SendTextMessage(msg string, IsAtAll bool, at_dingtalk_id
 	text_info.At.AtUserIds = at_dingtalk_ids
 	text_info.At.AtMobiles = atmobiles
 	text_info.Msgtype = "text"
-	client := bot.EnableDumpAll()
-	client.R().SetHeader("Content-Type", "application/json;charset=utf-8")
-	resp, err = client.R().SetHeader("Content-Type", "application/json;charset=utf-8").SetBody(&text_info).Post(bot.BaseURL)
+	text, err := json.Marshal(text_info)
+	req, _ := http.NewRequest("POST", bot.url, strings.NewReader(string(text)))
+	req.Header.Set("Content-Type", "application/json;charset=utf-8")
+	re, err := bot.Client.Do(req)
 	if err != nil {
 		fmt.Println(err.Error())
 		return nil, err
 	}
+	defer re.Body.Close()
+	body, err := ioutil.ReadAll(re.Body)
+	resp = string(body)
 	return resp, err
 }
