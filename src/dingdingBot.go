@@ -1,4 +1,4 @@
-package dingdingBot
+package src
 
 //钉钉Webhook机器人使用，支持 text，link、actionCard、markdown 格式消息发送
 // 兼容sercet模式
