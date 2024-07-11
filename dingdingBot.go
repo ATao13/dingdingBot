@@ -58,20 +58,20 @@ func InitBot(url string, secret string) *DingTalkBot {
 		url,
 	}
 }
-func (bot *DingTalkBot) SendTextMessage(msg string, IsAtAll bool, at_dingtalk_ids []string, atmobiles []string) (resp interface{}, err error) {
+func (bot *DingTalkBot) SendTextMessage(msg string, IsAtAll bool, dingTalkIds []string, atMobiles []string) (resp interface{}, err error) {
 	//  text类型
 	// :param msg: 消息内容
 	// :param IsAtAll: @所有人时：true，否则为false（可选）
-	// :param atmobiles: 被@人的手机号（注意：可以在msg内容里自定义@手机号的位置，也支持同时@多个手机号，可选）
-	// :param at_dingtalk_ids: 被@人的dingtalkId（可选）
+	// :param atMobiles: 被@人的手机号（注意：可以在msg内容里自定义@手机号的位置，也支持同时@多个手机号，可选）
+	// :param dingTalkIds: 被@人的dingtalkId（可选）
 	// :return: 返回消息发送结果
-	text_info := new(textMessage)
-	text_info.Text.Content = msg
-	text_info.At.IsAtAll = IsAtAll
-	text_info.At.AtUserIds = at_dingtalk_ids
-	text_info.At.AtMobiles = atmobiles
-	text_info.Msgtype = "text"
-	text, err := json.Marshal(text_info)
+	textInfo := new(textMessage)
+	textInfo.Text.Content = msg
+	textInfo.At.IsAtAll = IsAtAll
+	textInfo.At.AtUserIds = dingTalkIds
+	textInfo.At.AtMobiles = atMobiles
+	textInfo.Msgtype = "text"
+	text, err := json.Marshal(textInfo)
 	req, _ := http.NewRequest("POST", bot.url, strings.NewReader(string(text)))
 	req.Header.Set("Content-Type", "application/json;charset=utf-8")
 	re, err := bot.client.Do(req)
